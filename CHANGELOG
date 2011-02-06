@@ -1,0 +1,4 @@
+February 6, 2011
+
+* defined PHP_ACTIVERECORD_AUTOLOAD_PREPEND
+* Added sample model in models, sql chema taken from Kohana ORM Auth
