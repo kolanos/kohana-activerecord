@@ -1,8 +1,10 @@
-February 7, 2011
+February 10, 2011
+* Ported ORM Auth + Sprig Auth to Arm
+* Rename models to follow php-activerecord naming convention
 
+February 7, 2011
 * Small fix factory constructor, lowercase sample model
 
 February 6, 2011
-
 * defined PHP_ACTIVERECORD_AUTOLOAD_PREPEND
 * Added sample model in models, sql chema taken from Kohana ORM Auth
