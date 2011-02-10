@@ -1,5 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * Arm Auth User Token Model.
+ *
+ * @package    Arm Auth
+ * @author     Devi Mandiri <devi.mandiri@gmail.com>
+ * @copyright  (c) 2011 Devi Mandiri
+ * @license    MIT
+ */
 class UserToken extends Arm {
 
 	static $belongs_to = array('user');
@@ -9,8 +16,13 @@ class UserToken extends Arm {
 	public function create_token()
 	{
 		$this->token = sha1(uniqid(Text::random('alnum', 32), TRUE));
-	}		
+	}
 	
+	/**
+	 * Handles garbage collection and deleting of expired objects.
+	 *
+	 * @return  void
+	 */	
 	public function __construct(array $attributes=array(), $guard_attributes=true, $instantiating_via_find=false, $new_record=true)
 	{
 		parent::__construct($attributes, $guard_attributes, $instantiating_via_find, $new_record);
@@ -20,19 +32,22 @@ class UserToken extends Arm {
 			$this->delete_expired();
 		}
 
-		if ($this->expires < time() AND $this->is_loaded())
+		if ($this->expires < time() AND $this->loaded())
 		{
 			$this->delete();
 		}
 	}
 
+	/**
+	 * Deletes all expired tokens.
+	 *
+	 * @return  Arm
+	 */
 	public function delete_expired()
 	{
 		static::delete_all(array('conditions' => array('expires < ?', time())));
 
 		return $this;
 	}
-	
-
 
 } 

@@ -1,10 +1,18 @@
 <?php defined('SYSPATH') or die('No direct script access.');
-
+/**
+ * Arm Auth User Model.
+ *
+ * @package    Arm Auth
+ * @author     Devi Mandiri <devi.mandiri@gmail.com>
+ * @copyright  (c) 2011 Devi Mandiri
+ * @license    MIT
+ */
 class User extends Arm {
-	
+
 	static $has_many = array(
-		array('roles_users'),
-		array('roles', 'through' => 'roles_users')
+		array('user_tokens'),
+		array('roles_users'),		
+		array('roles', 'through' => 'roles_users')		
 	);	
 	
 	static $validates_presence_of = array(
@@ -36,11 +44,33 @@ class User extends Arm {
 		$this->password	= Auth::instance()->hash($this->password);
 	}	
 	
+	/**
+	 * Get unique key based on value.
+	 * 
+	 * @param mixed $value	Key value for match
+	 * @return string		Unique key name to attempt to match against
+	 */
 	public static function unique_key($value)
 	{
-		return Valid::email($value) ? 'email' : 'username';
+		if (Valid::email($value))
+		{
+			return 'email';
+		} 
+		elseif (is_string($value))
+		{
+			return 'username';
+		}
+		return 'id';
 	}
 	
+	/**
+	 * Update password.
+	 * 
+	 * @param string $old	Current/Old password
+	 * @param string $new	New password
+	 * @param mixed $key	Key value for match
+	 * @return boolean
+	 */
 	public function update_password($old, $new, $key)
 	{
 		if ($old === NULL OR $new === NULL)
@@ -51,25 +81,50 @@ class User extends Arm {
 			'password' => Auth::instance()->hash($old)
 		));
 		
+		if (! is_object($user))
+		{
+			return FALSE;
+		}
+		
 		return $user->update_attribute('password', Auth::instance()->hash($new));
 	}
-	
+
+	/**
+	 * Check for unique key existence.
+	 * 
+	 * @param mixed	Key value for match
+	 * @return boolean
+	 */
 	public function unique_key_exists($value)
 	{
 		return User::exists(array(static::unique_key($value) => $value));
 	}
-	
+
+	/**
+	 * Complete the login for a user by incrementing the logins and saving login timestamp.
+	 *
+	 * @param   object   user model object
+	 * @return  void
+	 */
 	public function complete_login()
 	{
-		if ($this->is_loaded())
-		{			
-			$this->update_attribute('logins', $this->logins + 1); // TODO
-			$this->update_attribute('last_login', time());
+		if (! $this->loaded())
+		{
+			return;
 		}
+		
+		$this->update_attribute('logins', $this->logins + 1); // TODO
+		$this->update_attribute('last_login', time());		
 	}
-	
+
+	/**
+	 * Check if user has a particular role.
+	 * 
+	 * @param mixed $role 	Role to test for, can be Role object, string role name of integer role id
+	 * @return bool			Whether or not the user has the requested role
+	 */
 	public function has_role($role)
-	{		
+	{
 		if ($role instanceof Role)
 		{
 			$key = 'id';
@@ -95,6 +150,6 @@ class User extends Arm {
 		}
 		
 		return FALSE;
-	}	
-	
+	}
+
 }

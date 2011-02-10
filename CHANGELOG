@@ -1,6 +1,7 @@
 February 10, 2011
 * Ported ORM Auth + Sprig Auth to Arm
 * Rename models to follow php-activerecord naming convention
+* Added license
 
 February 7, 2011
 * Small fix factory constructor, lowercase sample model
