@@ -13,7 +13,7 @@ class User extends Arm {
 		array('user_tokens'),
 		array('roles_users'),		
 		array('roles', 'through' => 'roles_users')		
-	);	
+	);
 	
 	static $validates_presence_of = array(
 		array('username'),
@@ -24,7 +24,7 @@ class User extends Arm {
 	static $validates_size_of = array(
 		array('username', 'within' => array(4,32)),
 		array('email', 'within' => array(4,127)),
-		array('password', 'minimum' => 6)
+		array('password', 'minimum' => 6)		
 	);
 	
 	static $validates_format_of = array(
@@ -36,12 +36,16 @@ class User extends Arm {
 		array('username'),
 		array('email')
 	);	
-	
+
 	static $after_validation = array('filters');
 	
 	public function filters()
 	{
-		$this->password	= Auth::instance()->hash($this->password);
+		if ( ! $this->salt)
+			// Generate a random 22 character salt
+			$this->salt = Text::random('alnum', 22);
+		
+		$this->password	= Bonafide::instance()->hash($this->password, $this->salt);
 	}	
 	
 	/**
@@ -66,27 +70,32 @@ class User extends Arm {
 	/**
 	 * Update password.
 	 * 
-	 * @param string $old	Current/Old password
-	 * @param string $new	New password
-	 * @param mixed $key	Key value for match
+	 * @param string	Current/Old password
+	 * @param string	New password
+	 * @param mixed 	Key value for match
+	 * @param string 	New salt
 	 * @return boolean
 	 */
-	public function update_password($old, $new, $key)
+	public function update_password($old, $new, $key, $new_salt = NULL)
 	{
 		if ($old === NULL OR $new === NULL)
 			return FALSE;		
 		
-		$user = User::find(array(
-			static::unique_key($key) => $key,
-			'password' => Auth::instance()->hash($old)
-		));
+		$user = User::find(array(static::unique_key($key) => $key));
 		
-		if (! is_object($user))
+		if ( ! $user)
 		{
 			return FALSE;
 		}
 		
-		return $user->update_attribute('password', Auth::instance()->hash($new));
+		if ( ! Bonafide::instance()->check($old, $user->password, $user->salt))
+			return FALSE;
+		
+		if ( ! $new_salt)
+			// Generate new salt
+			$new_salt = Text::random('alnum', 22);
+			
+		return $user->update_attribute('password', Bonafide::instance()->hash($new, $new_salt));
 	}
 
 	/**
@@ -113,7 +122,7 @@ class User extends Arm {
 			return;
 		}
 		
-		$this->update_attribute('logins', $this->logins + 1); // TODO
+		$this->update_attribute('logins', $this->logins + 1);
 		$this->update_attribute('last_login', time());		
 	}
 

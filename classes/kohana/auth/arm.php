@@ -61,12 +61,12 @@ class Kohana_Auth_Arm extends Auth {
 	{
 		$user = $this->_get_object($user);
 		
-		if (! $user)
+		if ( ! $user)
 		{
 			return FALSE;
 		}
 
-		if ($user->has_role('login') AND $user->password === $password)
+		if ($user->has_role('login') AND Bonafide::instance()->check($password, $user->password, $user->salt))
 		{
 			if ($remember === TRUE)
 			{
@@ -101,7 +101,7 @@ class Kohana_Auth_Arm extends Auth {
 	{
 		$user = $this->_get_object($user);
 		
-		if (! $user)
+		if ( ! $user)
 		{
 			return FALSE;
 		}
@@ -204,7 +204,7 @@ class Kohana_Auth_Arm extends Auth {
 	{
 		$user = $this->_get_object($user);
 		
-		if (! $user)
+		if ( ! $user)
 		{
 			return;
 		}
@@ -258,9 +258,25 @@ class Kohana_Auth_Arm extends Auth {
 		$user = $this->get_user();
 
 		if ( ! $user)
-			return FALSE;		
+			return FALSE;
 
-		return ($this->hash($password) === $user->password);
+		return Bonafide::instance()->check($password, $user->password, $user->salt);
 	}
+	
+	/**
+	 * Attempt to log in a user by using an ORM object and plain-text password.
+	 *
+	 * @param   string   username to log in
+	 * @param   string   password to check against
+	 * @param   boolean  enable autologin
+	 * @return  boolean
+	 */	
+	public function login($username, $password, $remember = FALSE)
+	{
+		if (empty($password))
+			return FALSE;
+
+		return $this->_login($username, $password, $remember);
+	}	
 
 }
