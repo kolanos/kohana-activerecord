@@ -4,7 +4,7 @@
  * 
  * [ref-bonafide]: http://github.com/shadowhand/bonafide
  *
- * @package    Arm Auth
+ * @package    Arm/Auth
  * @author     Devi Mandiri <devi.mandiri@gmail.com>
  * @copyright  (c) 2011 Devi Mandiri
  * @license    MIT
