@@ -289,5 +289,25 @@ class Kohana_Auth_Arm extends Auth {
 
 		return Bonafide::instance()->check($password, $hash, $salt, 10);
 	}
+	
+	/**
+	 * We don't need this one.
+	 *
+	 * @return void
+	 */
+	public function hash_password($password)
+	{
+		return;
+	}
+
+	/**
+	 * We don't need this one.
+	 *
+	 * @return void
+	 */
+	public function hash($str)
+	{
+		return;
+	}
 
 }
