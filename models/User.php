@@ -228,5 +228,27 @@ class User extends Arm {
 			return $user->errors->full_messages();
 		}
 	}
-
+	
+	/*
+	 * @var  string  Virtual field for password confirm
+	 */
+	public $password_confirm;
+	
+	/*
+	 * Custom validation to match between password and password confirm.
+	 * 
+	 */
+	public function validate()
+	{
+		//if ($this->attribute_is_dirty('password')) // don't know why it's not working in my box
+		
+		if ($this->is_dirty() AND array_key_exists('password', $this->dirty_attributes()))
+		{
+			if ($this->password !== $this->password_confirm)
+			{
+				$this->errors->add('password', "must be the same as Password Confirm.");
+			}
+		}
+	}
+	
 }
