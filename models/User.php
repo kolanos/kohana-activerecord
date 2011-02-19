@@ -45,7 +45,7 @@ class User extends Arm {
 		$this->salt = Text::random('alnum', 22);
 
 		// Hashed password
-		$this->password	= Auth::instance()->bonafide_hash($this->password, $this->salt, 10);
+		$this->password	= Auth::instance()->bonafide_hash($this->password, $this->salt);
 	}
 
 	/**
