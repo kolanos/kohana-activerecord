@@ -1,3 +1,7 @@
+February 19, 2011
+* Added custom validation to match between password and password confirm
+* Added validation to UserToken and RolesUser
+
 February 10, 2011
 * Ported ORM Auth + Sprig Auth to Arm
 * Rename models to follow php-activerecord naming convention

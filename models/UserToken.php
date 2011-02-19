@@ -16,7 +16,15 @@ class UserToken extends Arm {
 	public function create_token()
 	{
 		$this->token = sha1(uniqid(Text::random('alnum', 32), TRUE));
+		$this->created = time();
 	}
+	
+	// field token and created will have those fields automatically updated upon model creation and model updates.
+	static $validates_presence_of = array(
+		array('user_id'),
+		array('user_agent'),
+		array('expires')
+	);
 	
 	/**
 	 * Handles garbage collection and deleting of expired objects.

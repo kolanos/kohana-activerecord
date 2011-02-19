@@ -174,4 +174,41 @@ class User extends Arm {
 		}
 	}
 	
+	/**
+	 * Helper function to create user account (with validation).
+	 * 
+	 * @param	string	username
+	 * @param	string	plaintext password
+	 * @param	string	email
+	 * @param	string	role user
+	 * @return	mixed	Model if success, Array if validation failed.
+	 */
+	public static function create_user($username, $password, $password_confirm, $email, $role = NULL, $activate = TRUE)
+	{
+		$user = User::create(array(
+			'username' => $username,
+			'password' => $password,
+			'email' => $email,
+			'password_confirm' => $password_confirm
+		));
+
+		if ($user AND $user->loaded())
+		{
+			$role = Role::find_by_name($role);
+			if ($role)
+				RolesUser::create(array('role_id' => $role->id,'user_id' => $user->id));
+
+			if ($activate === TRUE)
+			{
+				$role = Role::find_by_name('login');
+				if ($role)
+					RolesUser::create(array('role_id' => $activate,'user_id' => $user->id));
+			}
+			return $user;
+		}
+		else
+		{
+			return $user->errors->full_messages();
+		}
+	}
 }
