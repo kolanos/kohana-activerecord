@@ -58,7 +58,7 @@ class Kohana_Auth_Arm extends Auth {
 	 * @param   boolean  enable auto-login
 	 * @return  boolean
 	 */
-	protected function _login($user, $password, $remember)	
+	protected function _login($user, $password, $remember)
 	{
 		$user = User::find_user($user);
 
@@ -73,9 +73,11 @@ class Kohana_Auth_Arm extends Auth {
 			{
 				// Token data
 				$data = array(
-					'user_id'    => $user->id,
-					'expires'    => time() + $this->_config['lifetime'],
-					'user_agent' => sha1(Request::$user_agent),
+					'user_id'	=> $user->id,
+					'expires'	=> time() + $this->_config['lifetime'],
+					// change this to anything you want to provide extra token check
+					// eg. sha1(Request::$user_agent.Request::$client_ip)
+					'extras'	=> sha1(Request::$user_agent), 
 				);
 
 				$token = UserToken::create($data);
@@ -125,7 +127,9 @@ class Kohana_Auth_Arm extends Auth {
 			
 			if ($token AND $token->user)
 			{
-				if ($token->user_agent === sha1(Request::$user_agent))
+				// change this to anything you want to provide extra token check
+				// eg. sha1(Request::$user_agent.Request::$client_ip)
+				if ($token->extras === sha1(Request::$user_agent))
 				{
 					$token->save();
 

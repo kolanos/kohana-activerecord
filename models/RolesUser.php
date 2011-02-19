@@ -15,4 +15,14 @@ class RolesUser extends Arm {
 		array('user'),
 		array('role')
 	);
+	
+	static $validates_presence_of = array(
+		array('user_id'),
+		array('role_id')
+	);
+	
+	static $validates_numericality_of = array(
+		array('user_id', 'only_integer'),
+		array('role_id', 'only_integer')
+	);
 }
