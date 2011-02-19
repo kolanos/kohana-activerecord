@@ -201,12 +201,13 @@ class User extends Arm {
 	 * @param	string	role user
 	 * @return	mixed	Model if success, Array if validation failed.
 	 */
-	public static function create_user($username, $password, $email, $role, $activate = TRUE)
+	public static function create_user($username, $password, $password_confirm, $email, $role, $activate = TRUE)
 	{
 		$user = User::create(array(
 			'username' => $username,
 			'password' => $password,
-			'email' => $email
+			'email' => $email,
+			'password_confirm' => $password_confirm
 		));
 
 		if ($user AND $user->loaded())
